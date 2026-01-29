@@ -2,10 +2,13 @@
   "required": true,
   "minVersion": "0.8",
   "package": "org.z2six.betterglint.mixin",
-  "compatibilityLevel": "JAVA_18",
+  "refmap": "${mod_id}.refmap.json",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "org.z2six.betterglint.mixin.MixinTitleScreen"
+    "GameRendererMixin",
+    "ItemRendererMixin",
+    "ItemStackMixin"
   ],
   "server": [],
   "injectors": {
