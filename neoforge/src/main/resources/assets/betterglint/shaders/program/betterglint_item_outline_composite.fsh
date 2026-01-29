@@ -18,6 +18,7 @@ void main() {
     float outlineAlpha = texture(OutlineSampler, uv).a;
     float inside = step(0.5, texture(MaskSampler, uv).a);
     outlineAlpha *= (1.0 - inside);
+    outlineAlpha = smoothstep(0.02, 0.08, outlineAlpha);
 
     vec3 outlineColor = vec3(OutlineR, OutlineG, OutlineB);
     vec3 outRgb = mix(scene.rgb, outlineColor, outlineAlpha);

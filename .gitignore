@@ -22,3 +22,10 @@ build
 eclipse
 run
 runs
+/neoforge/.eclipse/
+/buildSrc/
+/.idea/
+/.vscode/
+/assets/
+/buildSrc/
+/buildSrc/src/
