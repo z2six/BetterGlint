@@ -9,7 +9,7 @@
       "name": "betterglint_item_outline_edge",
       "intarget": "mask",
       "outtarget": "bg_outline",
-      "use_linear_filter": true
+      "use_linear_filter": false
     },
     {
       "name": "betterglint_item_outline_blur",

@@ -1,0 +1,18 @@
+{
+  "vertex": "sobel",
+  "fragment": "betterglint_item_outline_composite",
+  "attributes": [ "Position" ],
+  "samplers": [
+    { "name": "DiffuseSampler" },
+    { "name": "OutlineSampler" },
+    { "name": "MaskSampler" }
+  ],
+  "uniforms": [
+    { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "InSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
+    { "name": "OutSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
+    { "name": "OutlineR", "type": "float", "count": 1, "values": [ 0.6667 ] },
+    { "name": "OutlineG", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "OutlineB", "type": "float", "count": 1, "values": [ 1.0 ] }
+  ]
+}
