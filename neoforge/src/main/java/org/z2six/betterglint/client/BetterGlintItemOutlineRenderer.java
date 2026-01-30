@@ -1,6 +1,7 @@
 package org.z2six.betterglint.client;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -11,8 +12,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.z2six.betterglint.Constants;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public final class BetterGlintItemOutlineRenderer {
     private static final ResourceLocation POST_CHAIN = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "shaders/post/item_outline.json");
@@ -49,16 +53,41 @@ public final class BetterGlintItemOutlineRenderer {
         }
 
         if (!maskDirty) {
-            maskTarget.clear(Minecraft.ON_OSX);
+            maskTarget.clear(Minecraft.ON_OSX); // clears depth to 1.0
             maskDirty = true;
         }
         maskTarget.bindWrite(true);
 
         MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(new ByteBufferBuilder(BUFFER_SIZE));
         IN_MASK_PASS.set(Boolean.TRUE);
+        boolean depthTestEnabled = true;
+        boolean blendEnabled = false;
+        int depthFunc = GL11.GL_LEQUAL;
+        boolean depthMask = true;
+        try {
+            depthTestEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
+            blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND);
+            depthFunc = GL11.glGetInteger(GL11.GL_DEPTH_FUNC);
+            ByteBuffer depthMaskBuf = BufferUtils.createByteBuffer(1);
+            GL11.glGetBooleanv(GL11.GL_DEPTH_WRITEMASK, depthMaskBuf);
+            depthMask = depthMaskBuf.get(0) != 0;
+        } catch (Throwable ignored) {
+        }
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_ALWAYS); // always write weapon depth into the mask depth buffer
+        RenderSystem.depthMask(true);
         try {
             itemRenderer.render(itemStack, displayContext, leftHand, poseStack, bufferSource, combinedLight, combinedOverlay, model);
         } finally {
+            RenderSystem.depthMask(depthMask);
+            RenderSystem.depthFunc(depthFunc);
+            if (!depthTestEnabled) {
+                RenderSystem.disableDepthTest();
+            }
+            if (blendEnabled) {
+                RenderSystem.enableBlend();
+            }
             IN_MASK_PASS.set(Boolean.FALSE);
         }
         bufferSource.endBatch();
@@ -68,6 +97,10 @@ public final class BetterGlintItemOutlineRenderer {
     }
 
     public static void processAndComposite(float partialTicks) {
+        processAndComposite(partialTicks, false);
+    }
+
+    public static void processAndComposite(float partialTicks, boolean firstPerson) {
         ensureInitialized();
         if (postChain == null || maskTarget == null || !maskDirty) {
             return;
@@ -77,6 +110,7 @@ public final class BetterGlintItemOutlineRenderer {
         postChain.setUniform("OutlineG", (float) BetterGlintClientConfig.outlineGreen() / 255.0F);
         postChain.setUniform("OutlineB", (float) BetterGlintClientConfig.outlineBlue() / 255.0F);
         postChain.setUniform("OutlineA", (float) BetterGlintClientConfig.outlineAlpha() / 255.0F);
+        postChain.setUniform("BlurScale", firstPerson ? 1.0F : 0.35F);
 
         Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
         postChain.process(partialTicks);

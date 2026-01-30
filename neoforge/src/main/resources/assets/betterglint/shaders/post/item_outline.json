@@ -41,8 +41,16 @@
       "outtarget": "swap",
       "auxtargets": [
         {
+          "name": "MainDepthSampler",
+          "id": "minecraft:main:depth"
+        },
+        {
           "name": "MaskSampler",
           "id": "mask"
+        },
+        {
+          "name": "MaskDepthSampler",
+          "id": "mask:depth"
         },
         {
           "name": "OutlineSampler",

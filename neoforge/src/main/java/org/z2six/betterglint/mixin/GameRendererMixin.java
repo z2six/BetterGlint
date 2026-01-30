@@ -23,14 +23,14 @@ public class GameRendererMixin {
     @Inject(method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V", at = @At("TAIL"))
     private void betterglint$processItemOutlinesDuringLevelRender(DeltaTracker deltaTracker, CallbackInfo ci) {
         if (BetterGlintOutlineState.consumeProcessingDuringLevelRenderRequest()) {
-            BetterGlintItemOutlineRenderer.processAndComposite(deltaTracker.getGameTimeDeltaTicks());
+            BetterGlintItemOutlineRenderer.processAndComposite(deltaTracker.getGameTimeDeltaTicks(), false);
         }
     }
 
     @Inject(method = "renderItemInHand(Lnet/minecraft/client/Camera;FLorg/joml/Matrix4f;)V", at = @At("TAIL"))
     private void betterglint$processItemOutlinesAfterHand(Camera camera, float partialTick, Matrix4f projectionMatrix, CallbackInfo ci) {
         if (BetterGlintOutlineState.consumeProcessingAfterHandRenderRequest()) {
-            BetterGlintItemOutlineRenderer.processAndComposite(partialTick);
+            BetterGlintItemOutlineRenderer.processAndComposite(partialTick, true);
         }
     }
 }
